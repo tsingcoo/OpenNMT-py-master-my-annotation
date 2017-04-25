@@ -14,7 +14,7 @@ class Dataset(object):
         self.src = srcData
         if tgtData:
             self.tgt = tgtData
-            assert (len(self.src) == len(self.tgt))
+            assert (len(self.src) == len(self.tgt))  # 确保源语言和目标语言的行数相同
         else:
             self.tgt = None
         self.cuda = cuda

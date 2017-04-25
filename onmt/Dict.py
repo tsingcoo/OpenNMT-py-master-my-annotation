@@ -21,7 +21,7 @@ class Dict(object):
         return len(self.idxToLabel)
 
     # Load entries from a file.
-    def loadFile(self, filename):
+    def loadFile(self, filename):  # 这应该是词典，label和idx分别对应单词和下标
         for line in open(filename):
             fields = line.split()
             label = fields[0]
@@ -88,8 +88,8 @@ class Dict(object):
 
         # Only keep the `size` most frequent entries.
         freq = torch.Tensor(
-                [self.frequencies[i] for i in range(len(self.frequencies))])
-        _, idx = torch.sort(freq, 0, True)
+            [self.frequencies[i] for i in range(len(self.frequencies))])
+        _, idx = torch.sort(freq, 0, True)  # 降序排列，返回的第二个参数为对应的下标
 
         newDict = Dict()
         newDict.lower = self.lower
