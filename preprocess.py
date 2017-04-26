@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser(description='preprocess.py')
 ## **Preprocess Options**
 ##
 
-parser.add_argument('-config',    help="Read options from this file")
+parser.add_argument('-config', help="Read options from this file")
 
 parser.add_argument('-train_src', required=True,
                     help="Path to the training source data")
@@ -18,7 +18,7 @@ parser.add_argument('-train_tgt', required=True,
 parser.add_argument('-valid_src', required=True,
                     help="Path to the validation source data")
 parser.add_argument('-valid_tgt', required=True,
-                     help="Path to the validation target data")
+                    help="Path to the validation target data")
 
 parser.add_argument('-save_data', required=True,
                     help="Output file for the prepared data")
@@ -32,12 +32,11 @@ parser.add_argument('-src_vocab',
 parser.add_argument('-tgt_vocab',
                     help="Path to an existing target vocabulary")
 
-
 parser.add_argument('-seq_length', type=int, default=50,
                     help="Maximum sequence length")
-parser.add_argument('-shuffle',    type=int, default=1,
+parser.add_argument('-shuffle', type=int, default=1,
                     help="Shuffle data")
-parser.add_argument('-seed',       type=int, default=3435,
+parser.add_argument('-seed', type=int, default=3435,
                     help="Random seed")
 
 parser.add_argument('-lower', action='store_true', help='lowercase data')
@@ -48,6 +47,7 @@ parser.add_argument('-report_every', type=int, default=100000,
 opt = parser.parse_args()
 
 torch.manual_seed(opt.seed)
+
 
 def makeVocabulary(filename, size):
     vocab = onmt.Dict([onmt.Constants.PAD_WORD, onmt.Constants.UNK_WORD,
@@ -67,7 +67,6 @@ def makeVocabulary(filename, size):
 
 
 def initVocabulary(name, dataFile, vocabFile, vocabSize):
-
     vocab = None
     if vocabFile is not None:
         # If given, load existing word dictionary.
@@ -110,7 +109,7 @@ def makeData(srcFile, tgtFile, srcDicts, tgtDicts):
                 print('WARNING: source and target do not have the same number of sentences')
             break
 
-        if len(srcWords) <= opt.seq_length and len(tgtWords) <= opt.seq_length:
+        if len(srcWords) <= opt.seq_length and len(tgtWords) <= opt.seq_length:  # 过滤较长的sequence
 
             src += [srcDicts.convertToIdx(srcWords,
                                           onmt.Constants.UNK_WORD)]
@@ -138,7 +137,7 @@ def makeData(srcFile, tgtFile, srcDicts, tgtDicts):
         tgt = [tgt[idx] for idx in perm]
         sizes = [sizes[idx] for idx in perm]
 
-    print('... sorting sentences by size')
+    print('... sorting sentences by size')  # 既然这里要排序，那么上面的打乱似乎没有什么意义了
     _, perm = torch.sort(torch.Tensor(sizes))
     src = [src[idx] for idx in perm]
     tgt = [tgt[idx] for idx in perm]
@@ -150,7 +149,6 @@ def makeData(srcFile, tgtFile, srcDicts, tgtDicts):
 
 
 def main():
-
     dicts = {}
     dicts['src'] = initVocabulary('source', opt.train_src, opt.src_vocab,
                                   opt.src_vocab_size)
@@ -165,13 +163,12 @@ def main():
     print('Preparing validation ...')
     valid = {}
     valid['src'], valid['tgt'] = makeData(opt.valid_src, opt.valid_tgt,
-                                    dicts['src'], dicts['tgt'])
+                                          dicts['src'], dicts['tgt'])
 
     if opt.src_vocab is None:
         saveVocabulary('source', dicts['src'], opt.save_data + '.src.dict')
     if opt.tgt_vocab is None:
         saveVocabulary('target', dicts['tgt'], opt.save_data + '.tgt.dict')
-
 
     print('Saving data to \'' + opt.save_data + '.train.pt\'...')
     save_data = {'dicts': dicts,
